@@ -68,6 +68,8 @@ public class AccountController {
 
         return Result.fail("注册成功");
 
+
+
     }
 
 }
