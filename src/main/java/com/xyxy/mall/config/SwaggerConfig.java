@@ -19,7 +19,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.bilibili.itlaoge.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.xyxy.mall.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -27,7 +27,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("springboot利用swagger构建api文档")
                 .description("简单优雅的restful风格")
-                .termsOfServiceUrl("http://localhost:8080")
+                .termsOfServiceUrl("http://localhost:8081")
                 .version("1.1")
                 .build();
     }
