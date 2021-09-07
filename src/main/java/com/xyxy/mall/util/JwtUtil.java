@@ -29,7 +29,7 @@ public class JwtUtil {
     /**
      * 生成jwt token
      */
-    public String generateToken(long userId) {
+    public String generateToken(String userId) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + expire * 1000);
