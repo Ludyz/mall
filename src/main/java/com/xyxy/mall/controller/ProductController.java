@@ -141,4 +141,6 @@ public class ProductController {
             return Result.fail("更新失败");
         }
     }
+
+    public void test(){}
 }
