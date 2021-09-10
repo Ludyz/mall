@@ -27,6 +27,7 @@ public class Cart implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //test
     @TableId(value = "carid",type = IdType.UUID)
     private String carid;
 

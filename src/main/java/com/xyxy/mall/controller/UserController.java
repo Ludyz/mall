@@ -33,7 +33,9 @@ public class UserController {
 
     }
 
-    /*根据用户名更新用户信息*/
+    /*根据用户名更新用户信息
+    * test
+    * */
     @PutMapping("/updUserMessage")
     public Result updUserMessage(User user){
         UpdateWrapper<User> updateWrapper=new UpdateWrapper<>();

@@ -111,7 +111,9 @@ public class CartController {
     }
 
 
-    /*点击选中商品*/
+    /*点击选中商品
+    * test
+    * */
     @PostMapping("/onClickPro")
     public Result onClickPro(String proid,String userid){
         QueryWrapper queryWrapper=new QueryWrapper();

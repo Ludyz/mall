@@ -134,7 +134,9 @@ public class ProductController {
         }
     }
 
-    /*根据商品名称更新商品信息*/
+    /*根据商品名称更新商品信息
+    * test
+    * */
     @PutMapping("/updProductByName")
     public Result updProductByName(Product product){
         UpdateWrapper<Product> updateWrapper=new UpdateWrapper<>();

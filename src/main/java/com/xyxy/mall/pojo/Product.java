@@ -28,6 +28,7 @@ public class Product implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //test
     @TableId(value = "proid",type = IdType.INPUT)
     @ApiModelProperty(value = "商品id")
     private String proid;
