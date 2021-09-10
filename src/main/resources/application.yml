@@ -5,10 +5,12 @@ spring:
     url: jdbc:mysql://149.129.35.90:3306/mall?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
     username: admin
     password: Duyou.2a!
+  mvc:
+    static-path-pattern: /**
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
 server:
-  port: 8081
+  port: 8082
 logging:
   level:
     com.xyxy.mall.mapper: debug

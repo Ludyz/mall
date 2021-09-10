@@ -66,9 +66,7 @@ public class AccountController {
         userDB.setPassword(passwordMD5);
         userService.save(userDB);
 
-        return Result.fail("注册成功");
-
-
+        return Result.success("注册成功");
 
     }
 

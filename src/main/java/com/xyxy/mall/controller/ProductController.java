@@ -1,6 +1,8 @@
 package com.xyxy.mall.controller;
 
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,10 +11,18 @@ import com.xyxy.mall.common.lang.Result;
 import com.xyxy.mall.pojo.Product;
 import com.xyxy.mall.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.util.ClassUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * <p>
@@ -30,14 +40,28 @@ public class ProductController {
     IProductService iProductService;
 
     /*  插入单个商品*/
-    @PostMapping("/insProduct")
-    public Result insProduct(@RequestBody Product product){
-        boolean result= iProductService.save(product);
-        if (result==true){
-            return Result.success(result);
-        }else {
-            return Result.fail("插入失败");
+    @PostMapping(value = "insProduct",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Result insProduct(HttpServletRequest request,@RequestParam(value = "product",required = true)String productJson,
+                             @RequestParam(value = "mainimage",required = false) MultipartFile mainimage,
+                             @RequestParam(value = "subimage",required = false) MultipartFile subimage){
+        Product product= JSONUtil.toBean(productJson,Product.class);
+        System.out.println(product);
+        String mainFileName="";
+        String subFileName="";
+        if (mainimage!=null){
+            mainFileName=iProductService.SavePicture(mainimage);
         }
+        if (subimage!=null){
+            subFileName=iProductService.SavePicture(subimage);
+        }
+        Product productDb=product;
+        product.setMainimage(mainFileName);
+        product.setSubimages(subFileName);
+        boolean bo=iProductService.save(product);
+        if (!bo){
+            return Result.fail("添加失败");
+        }
+        return  Result.success("添加成功");
     }
 
     /*  批量插入商品*/
@@ -74,8 +98,8 @@ public class ProductController {
     }
 
     /*根据ID查询单个商品*/
-    @GetMapping("/selProductById")
-    public Result selProductById(String proid){
+    @GetMapping("/selProductById/{proId}")
+    public Result selProductById(@PathVariable("proId") String proid){
         Product product=iProductService.getById(proid);
         if (product!=null){
             return Result.success(product);
@@ -108,14 +132,30 @@ public class ProductController {
     }
 
     /*根据ID更新单个商品*/
-    @PutMapping("/updProductById")
-    public Result updProductById(Product product){
-        boolean result=iProductService.updateById(product);
-        if (result==true){
-            return Result.success(result);
-        }else {
+    @PostMapping("/updProductById/{proId}")
+    public Result updProductById(@PathVariable("proId") String proId,
+                                 @RequestParam(value = "product",required = true)String productJson,
+                                 @RequestParam(value = "mainimage",required = false) MultipartFile mainimage,
+                                 @RequestParam(value = "subimage",required = false) MultipartFile subimage){
+        Product product= JSONUtil.toBean(productJson,Product.class);
+        System.out.println(product);
+        String mainFileName="";
+        String subFileName="";
+        if (mainimage!=null){
+            mainFileName=iProductService.SavePicture(mainimage);
+        }
+        if (subimage!=null){
+            subFileName=iProductService.SavePicture(subimage);
+        }
+        Product productDb=product;
+        product.setMainimage(mainFileName);
+        product.setSubimages(subFileName);
+        boolean bo=iProductService.updateById(productDb);
+        if (!bo){
             return Result.fail("更新失败");
         }
+        return  Result.success("更新成功");
+
     }
 
     /*根据ID批量更新商品*/
