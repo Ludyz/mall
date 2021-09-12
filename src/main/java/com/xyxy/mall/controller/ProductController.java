@@ -119,7 +119,12 @@ public class ProductController {
         }
     }
 
-    /*  分页查询产品信息*/
+    /*  分页查询产品信息
+    * 参数：
+    *       pageNo:
+    *       pageSize:
+    *       proid:
+    * */
     @GetMapping("/selProductPage")
     public Result selProductPage(int pageNo,int pageSize,String proid){
         IPage<Product> page=new Page(pageNo,pageSize);
@@ -169,11 +174,13 @@ public class ProductController {
         }
     }
 
-    /*根据商品名称更新商品信息*/
+    /*根据商品名称更新商品信息
+    * test
+    * */
     @PutMapping("/updProductByName")
-    public Result updProductByName(Product product,String name){
+    public Result updProductByName(Product product){
         UpdateWrapper<Product> updateWrapper=new UpdateWrapper<>();
-        updateWrapper.eq("name",name);
+        updateWrapper.eq("name",product.getName());
         boolean result=iProductService.update(product,updateWrapper);
         if (result==true){
             return Result.success(result);

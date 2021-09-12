@@ -27,6 +27,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    //test
     @ApiModelProperty(value = "用户表id")
     @TableId(value = "userid", type = IdType.INPUT)
     private String userid;
