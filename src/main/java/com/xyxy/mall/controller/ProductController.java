@@ -54,9 +54,11 @@ public class ProductController {
         if (subimage!=null){
             subFileName=iProductService.SavePicture(subimage);
         }
+        String uuid = UUID.randomUUID().toString().replace("-", "").toLowerCase();
         Product productDb=product;
-        product.setMainimage(mainFileName);
-        product.setSubimages(subFileName);
+        productDb.setProid(uuid);
+        productDb.setMainimage(mainFileName);
+        productDb.setSubimages(subFileName);
         boolean bo=iProductService.save(product);
         if (!bo){
             return Result.fail("添加失败");
@@ -126,13 +128,12 @@ public class ProductController {
     *       proid:
     * */
     @GetMapping("/selProductPage")
-    public Result selProductPage(int pageNo,int pageSize,String proid){
-        IPage<Product> page=new Page(pageNo,pageSize);
-        QueryWrapper<Product> wrapper=new QueryWrapper<>();
-        Product product=new Product();
-        product.setProid(proid);
-        wrapper.setEntity(product);
-        IPage iPage=iProductService.page(page,wrapper);
+    public Result selProductPage(@RequestParam(defaultValue = "1") int pageNo,
+                                 @RequestParam(defaultValue = "5") int pageSize){
+        Page page=new Page(pageNo,pageSize);
+        QueryWrapper<Product> queryWrapper=new QueryWrapper<Product>();
+        queryWrapper.orderByDesc("updatetime");
+        IPage<Product> iPage=iProductService.page(page,queryWrapper);
         return Result.success(iPage);
     }
 

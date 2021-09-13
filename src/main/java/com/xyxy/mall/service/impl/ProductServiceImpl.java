@@ -27,7 +27,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     public String SavePicture(MultipartFile file){
 
-        String path= "F:\\java project\\mall\\src\\main\\resources\\static\\productPicture\\";
+        String path= "F:\\productPicture\\";
         String fileName=file.getOriginalFilename();
         String key= UUID.randomUUID().toString().replace("-", "").toLowerCase();
         String fullFileName=key+"-"+fileName;

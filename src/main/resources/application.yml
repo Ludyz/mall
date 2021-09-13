@@ -7,6 +7,8 @@ spring:
     password: Duyou.2a!
   mvc:
     static-path-pattern: /**
+  resources:
+    static-locations: file:F://productPicture
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
 server:

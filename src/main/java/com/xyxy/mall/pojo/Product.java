@@ -31,7 +31,6 @@ public class Product implements Serializable {
     //test
     @TableId(value = "proid",type = IdType.INPUT)
     @ApiModelProperty(value = "商品id")
-    @TableId(value = "proid", type = IdType.UUID)
     private String proid;
 
     @ApiModelProperty(value = "类别Id")
