@@ -3,6 +3,7 @@ package com.xyxy.mall.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xyxy.mall.common.lang.Result;
 import com.xyxy.mall.pojo.Cart;
 import com.xyxy.mall.pojo.Product;
@@ -14,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -37,6 +35,17 @@ public class CartController {
     @Autowired
     ProductServiceImpl productService;
 
+    /*
+    * 购物车及商品信息
+    * 返回的商品List集合
+    * */
+    @GetMapping("/selectListPage")
+    public Result selectListPage(String id)
+    {
+        Page<Map<String, Object>> page = productService.selectListPage(1, 2,id);
+        return Result.success(page.getRecords());
+    }
+
     /*查询用户购物车里的全部商品*/
     @GetMapping("/selCarProAll")
     public Result selCarProAll(String userid){
@@ -49,6 +58,7 @@ public class CartController {
            proIdList.add(list.get(i).getProid());
        }
        Collection<Product> proList=productService.listByIds(proIdList);
+
        if (proList.size()!=0){
            return Result.success(proList);
        }else {
