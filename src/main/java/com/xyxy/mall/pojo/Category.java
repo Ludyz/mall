@@ -2,6 +2,9 @@ package com.xyxy.mall.pojo;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -24,6 +27,7 @@ public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @TableId(value = "cateid",type = IdType.UUID)
     @ApiModelProperty(value = "类别Id")
     private String cateid;
 

@@ -1,8 +1,10 @@
 package com.xyxy.mall.controller;
 
 
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xyxy.mall.common.lang.Result;
 import com.xyxy.mall.pojo.Cart;
 import com.xyxy.mall.pojo.Product;
@@ -12,12 +14,10 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -37,6 +37,20 @@ public class CartController {
     @Autowired
     ProductServiceImpl productService;
 
+    /*
+    * 购物车及商品信息
+    * 返回的商品List集合
+    * */
+
+    @GetMapping("/selectListPage")
+    public Result selectListPage(@RequestBody @RequestParam("id") String id,
+                                 @RequestParam(defaultValue = "1")int current,
+                                 @RequestParam(defaultValue = "5")int number)
+    {
+        Page<Map<String, Object>> page = productService.selectListPage(current, number,id);
+        return Result.success(page.getRecords());
+    }
+
     /*查询用户购物车里的全部商品*/
     @GetMapping("/selCarProAll")
     public Result selCarProAll(String userid){
@@ -49,6 +63,7 @@ public class CartController {
            proIdList.add(list.get(i).getProid());
        }
        Collection<Product> proList=productService.listByIds(proIdList);
+
        if (proList.size()!=0){
            return Result.success(proList);
        }else {
@@ -63,7 +78,11 @@ public class CartController {
     *       quantity:商品数量
     * */
     @PostMapping("/insProToCart")
-    public Result insProToCart(String proid,String userid,int quantity){
+    public Result insProToCart(@RequestBody JSONObject jsonParam){
+        System.out.println(jsonParam);
+        String userid= jsonParam.getStr("userid");
+        String proid= jsonParam.getStr("proid");
+        int  quantity= Integer.parseInt(jsonParam.getStr("quantity"));
         QueryWrapper queryWrapper=new QueryWrapper();
         queryWrapper.eq("userid",userid);
         queryWrapper.eq("proid",proid);
@@ -73,7 +92,7 @@ public class CartController {
             boolean reslut=cartService.save(new Cart().setProid(proid).setUserid(userid).setQuantity(quantity)
                     .setCreatetime(LocalDateTime.now()).setUpdatetime(LocalDateTime.now()));
             if (reslut==true){
-                return Result.success(reslut);
+                return Result.success("添加成功，在购物车等亲~");
             }else {
                 return Result.fail("添加失败");
             }
@@ -84,7 +103,7 @@ public class CartController {
             updateWrapper.eq("carid",cart.getCarid());
             boolean result=cartService.update(new Cart().setQuantity(proQuantity).setUpdatetime(LocalDateTime.now()),updateWrapper);
             if (result==true){
-                return Result.success(result);
+                return Result.success("添加成功，在购物车等亲~");
             }else {
                 return Result.fail("添加失败");
             }
