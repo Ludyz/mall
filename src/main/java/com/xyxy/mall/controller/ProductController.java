@@ -10,6 +10,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xyxy.mall.common.lang.Result;
 import com.xyxy.mall.pojo.Product;
 import com.xyxy.mall.service.IProductService;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.util.ClassUtils;
@@ -33,12 +36,14 @@ import java.util.UUID;
  * @since 2021-09-06
  */
 @RestController
+
 @RequestMapping("/product")
 public class ProductController {
 
     @Autowired
     IProductService iProductService;
 
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     /*  插入单个商品*/
     @PostMapping(value = "insProduct",produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Result insProduct(HttpServletRequest request,@RequestParam(value = "product",required = true)String productJson,
@@ -66,6 +71,7 @@ public class ProductController {
         return  Result.success("添加成功");
     }
 
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     /*  批量插入商品*/
     @PostMapping("/insProducts")
     public Result insProducts(List<Product> productList){
@@ -77,6 +83,7 @@ public class ProductController {
         }
     }
 
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     /*  删除单个商品*/
     @DeleteMapping("/delProduct")
     public Result delProduct(String proid){
@@ -88,6 +95,7 @@ public class ProductController {
         }
     }
 
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     /*  删除多个商品*/
     @DeleteMapping("delProducts")
     public Result delProducts(List proidList){
@@ -109,6 +117,7 @@ public class ProductController {
             return Result.fail("查询失败");
         }
     }
+
 
     /*根据ID查询多个商品*/
     @GetMapping("/selProductByIds")
@@ -138,6 +147,7 @@ public class ProductController {
     }
 
     /*根据ID更新单个商品*/
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     @PostMapping("/updProductById/{proId}")
     public Result updProductById(@PathVariable("proId") String proId,
                                  @RequestParam(value = "product",required = true)String productJson,
@@ -165,6 +175,7 @@ public class ProductController {
     }
 
     /*根据ID批量更新商品*/
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     @PutMapping("/updProductByIds")
     public Result updProductByIds(List<Product> productList){
         boolean result=iProductService.updateBatchById(productList);
@@ -178,6 +189,7 @@ public class ProductController {
     /*根据商品名称更新商品信息
     * test
     * */
+    @RequiresRoles(value = {"admin","root"},logical = Logical.OR)
     @PutMapping("/updProductByName")
     public Result updProductByName(Product product){
         UpdateWrapper<Product> updateWrapper=new UpdateWrapper<>();
@@ -190,5 +202,5 @@ public class ProductController {
         }
     }
 
-    public void test(){}
+
 }

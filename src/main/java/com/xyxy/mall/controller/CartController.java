@@ -1,22 +1,29 @@
 package com.xyxy.mall.controller;
 
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xyxy.mall.common.lang.Result;
 import com.xyxy.mall.pojo.Cart;
 import com.xyxy.mall.pojo.Product;
+import com.xyxy.mall.service.ICartService;
 import com.xyxy.mall.service.impl.CartServiceImpl;
 import com.xyxy.mall.service.impl.ProductServiceImpl;
+import io.swagger.annotations.Authorization;
+import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -27,6 +34,7 @@ import java.util.*;
  * @author jobob
  * @since 2021-09-06
  */
+@RequiresAuthentication//认证权限
 @RestController
 @RequestMapping("/cart")
 public class CartController {
@@ -41,7 +49,6 @@ public class CartController {
     * 购物车及商品信息
     * 返回的商品List集合
     * */
-
     @GetMapping("/selectListPage")
     public Result selectListPage(@RequestBody @RequestParam("id") String id,
                                  @RequestParam(defaultValue = "1")int current,
@@ -79,7 +86,6 @@ public class CartController {
     * */
     @PostMapping("/insProToCart")
     public Result insProToCart(@RequestBody JSONObject jsonParam){
-        System.out.println(jsonParam);
         String userid= jsonParam.getStr("userid");
         String proid= jsonParam.getStr("proid");
         int  quantity= Integer.parseInt(jsonParam.getStr("quantity"));
@@ -111,75 +117,48 @@ public class CartController {
     }
 
     /*删除已选中的购物车里的商品*/
-    @DeleteMapping("/delOnCarProduct")
-    public Result delOnCarProduct(String userid){
-        QueryWrapper queryWrapper=new QueryWrapper();
-        queryWrapper.eq("userid",userid);
-        queryWrapper.eq("checked",1);
-        List<Cart> proList=cartService.list(queryWrapper);
-        List<String> cartIdList=new ArrayList();
-        for (int i=0;i<proList.size();i++){
-            cartIdList.add(proList.get(i).getCarid());
+    @PostMapping("/delOnCarProduct")
+    public Result delOnCarProduct(@RequestBody String jsonObject){
+        JSONArray jsonArray= JSONUtil.parseArray(jsonObject);
+        List<String> list=new ArrayList<>();
+        for (Object i:jsonArray) {
+            JSONObject object=JSONUtil.parseObj(i);
+            list.add(object.get("carid").toString());
         }
-        boolean result=cartService.removeByIds(cartIdList);
-        if (result=true){
-            return Result.success(result);
-        }else {
-            return Result.fail("删除失败");
+        boolean bo=cartService.removeByIds(list);
+        if (bo==true){
+            return Result.success("删除成功");
         }
+        return Result.fail("删除失败") ;
     }
 
-
-    /*点击选中商品
-    * test
-    * */
-    @PostMapping("/onClickPro")
-    public Result onClickPro(String proid,String userid){
-        QueryWrapper queryWrapper=new QueryWrapper();
-        queryWrapper.eq("userid",userid);
-        queryWrapper.eq("proid",proid);
-       Cart cart=cartService.getOne(queryWrapper);
-        try {
-            boolean checkpoint=cart.getChecked()!=1;
-        } catch (NullPointerException e) {//如果存在空指针则直接改为1（选中）
-            //e.printStackTrace();
-            boolean result=cartService.updateById(new Cart().setCarid(cart.getCarid()).setChecked(1));
-            return Result.success(result);
+    /**
+     * 改变购物车状态
+     * @return
+     */
+    @PostMapping("/changeCarChecked")
+    public Result changeChecked(@RequestBody String jsonParam){
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS");        JSONArray jsonArray= JSONUtil.parseArray(jsonParam);
+        List<Cart> list=new ArrayList<>();
+        for (Object i:jsonArray) {
+            JSONObject object=JSONUtil.parseObj(i);
+            Cart cart=new Cart();
+            cart.setCarid(object.get("carid").toString());
+            cart.setChecked((Integer)object.get("checked"));
+            cart.setQuantity((Integer)object.get("quantity"));
+            cart.setProid(object.get("proid").toString());
+            cart.setUserid(object.get("userid").toString());
+            cart.setCreatetime(LocalDateTime.parse(object.get("createtime").toString(),DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+            cart.setUpdatetime(LocalDateTime.now());
+            list.add(cart);
         }
 
-        if (cart.getChecked()!=1){
-           //如果商品未勾选(状态为0或为null)则更改
-           boolean result=cartService.updateById(new Cart().setCarid(cart.getCarid()).setChecked(1));
-           if (result==true){
-               return Result.success(result);
-           } else {
-               return Result.fail("更新失败");
-           }
-       }else {
-           //已勾选则直接返回
-           return Result.fail("商品已勾选");
-       }
-    }
-
-    /*取消选中商品*/
-    @PostMapping("/offClickPro")
-    public Result offClickPro(String proid,String userid){
-        QueryWrapper queryWrapper=new QueryWrapper();
-        queryWrapper.eq("userid",userid);
-        queryWrapper.eq("proid",proid);
-        Cart cart=cartService.getOne(queryWrapper);
-        if(cart.getChecked()==1){
-           // 如果商品为已勾选则更改
-            boolean result=cartService.updateById(new Cart().setCarid(cart.getCarid()).setChecked(0));
-            if (result==true){
-                return Result.success(result);
-            } else {
-                return Result.fail("更新失败");
-            }
-        }else{
-            //如果商品未勾选则直接返回
-            return Result.fail("商品状态未勾选");
+        boolean bo=cartService.updateBatchById(list,list.size());
+        System.out.println("a");
+        if(bo==true){
+            return Result.success("成功");
         }
+        return Result.fail("失败");
     }
 
 }

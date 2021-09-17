@@ -11,6 +11,7 @@ spring:
     static-locations: file:F://productPicture
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**Mapper.xml
+  type-aliases-package: com.xyxy.mall.pojo
 server:
   port: 8082
 logging:
